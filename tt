@@ -17,6 +17,7 @@ fps 2: 417 frames
 
 import os
 import re
+import math
 import argparse
 import tempfile
 from glob import glob
@@ -47,6 +48,7 @@ def parser():
     p.add_argument('--src', metavar='SRC')
     p.add_argument('--dst', metavar='DST')
     p.add_argument('--fps', metavar='FPS')
+    p.add_argument('--target-frames', metavar='FRAMES')
     return p.parse_args()
 
 def natural(s):
@@ -114,6 +116,26 @@ def join(args):
     assert(args.dst)
 
     TimelapseTools.join(os.path.join(args.src, '%05d.png'), args.dst)
+
+def remove_frames(args):
+
+    current_frames = len(glob(os.path.join(args.src, '*png')))
+    print('current frames', current_frames)
+    target_frames = int(args.target_frames)
+    print('target frames', target_frames)
+
+    to_remove = current_frames - target_frames
+    remove_every = math.floor(float(current_frames) / to_remove)
+
+    print('to remove', to_remove)
+    print('remove every', remove_every)
+
+    for n, frame_name in enumerate(glob(os.path.join(args.src, '*png'))):
+        if n % remove_every:
+            continue
+        print(frame_name)
+        os.unlink(frame_name)
+
 
 def main():
     args = parser()
