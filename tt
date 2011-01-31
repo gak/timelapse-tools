@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+'''
+Timelapse Tools
+
+Can generate frames from videos, then join them into videos.
+
+./tt split --frames-skip 0.1 --src=./videos/*.mov --out=./frames
+./tt squash --src=./frames
+./tt join --src=./frames --dst=./timelapse.webm
+
+
+3.5 minutes, 208 seconds, 6.8fps(?) = 1433 frames
+fps 1: 209 frames 
+fps 2: 417 frames
+
+'''
+
+import os
+import re
+import argparse
+import tempfile
+from glob import glob
+
+
+class TimelapseTools:
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def split(input, fps, output):
+        cmd = 'ffmpeg -i "{}" -r {} -f image2 "{}"' \
+            .format(input, fps, output)
+        print(cmd)
+        os.system(cmd)
+
+    @staticmethod
+    def join(files, output):
+        cmd = 'ffmpeg -i "{}" -b 512 "{}"' \
+            .format(files, output)
+        print(cmd)
+        os.system(cmd)
+
+def parser():
+    p = argparse.ArgumentParser()
+    p.add_argument('command', metavar='CMD')
+    p.add_argument('--src', metavar='SRC')
+    p.add_argument('--dst', metavar='DST')
+    p.add_argument('--fps', metavar='FPS')
+    return p.parse_args()
+
+def natural(s):
+    k = re.split('([0-9]*)', s)
+    if len(k) == 3:
+        k[1] = int(k[1])
+    return k
+
+def split(args):
+
+    assert(args.src)
+    assert(args.dst)
+    assert(args.fps)
+
+    args.src = os.path.expanduser(args.src)
+    args.dst = os.path.expanduser(args.dst)
+
+    if os.path.isdir(args.src):
+        p = os.path.join(args.src, '*')
+        files = glob(os.path.join(args.src, '*'))
+    else:
+        files = glob(args.src)
+
+    files.sort(key=natural)
+
+    n = 0
+
+    if not os.path.exists(args.dst):
+        os.mkdir(args.dst)
+
+    for file in files:
+        if not os.path.isfile(file):
+            print('{} is not a file'.format(file));
+            continue
+
+        # Spit out the frames
+        d = tempfile.mkdtemp()
+        out = os.path.join(d, '%05d.png')
+        TimelapseTools.split(file=file, fps=args.fps, out=out)
+
+        # Collect the frames and move them to the correct place
+        for frame_name in glob(os.path.join(d, '*png')):
+            n += 1
+            new_frame_name = os.path.join(args.dst, '%05i.png' % n)
+            os.rename(frame_name, new_frame_name)
+        
+def squash(args):
+
+    assert(args.src)
+    assert(not args.dst)
+    assert(not args.fps)
+
+    n = 0
+
+    for file in glob(os.path.join(args.src, '*')):
+        n += 1
+        new_frame_name = os.path.join(args.src, '%05i.png' % n)
+        print(file, ' -> ', new_frame_name)
+        os.rename(file, new_frame_name)
+
+
+def join(args):
+
+    assert(args.src)
+    assert(args.dst)
+
+    TimelapseTools.join(os.path.join(args.src, '%05d.png'), args.dst)
+
+def main():
+    args = parser()
+    func = globals().get(args.command, None)
+    if func:
+        func(args)
+    else:
+        print('CMD unknown. Try split or join.')
+
+if __name__ == '__main__':
+    main()
+
