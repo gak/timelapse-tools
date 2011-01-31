@@ -36,7 +36,7 @@ class TimelapseTools:
 
     @staticmethod
     def join(files, output):
-        cmd = 'ffmpeg -i "{}" -b 512 "{}"' \
+        cmd = 'ffmpeg -i "{}" -vcodec libx264 -vpre slow -crf 20 -threads 0 "{}"' \
             .format(files, output)
         print(cmd)
         os.system(cmd)
