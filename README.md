@@ -3,7 +3,7 @@ Time-lapse Tools
 
 A command line tool to create time-lapse videos from individual images or other videos.
 
-*NOTE*: This tool was released without much testing done on it. It can potentially be a dangerous tool because of this. Make sure you have backups of your files!
+**NOTE**: This tool was released without much testing done on it. It can potentially be a dangerous tool because of this. Make sure you have backups of your files!
 
 Requirements
 ------------
@@ -33,7 +33,7 @@ A directory of 1000 images, from DSC_0112.JPG to DSC_1111.JPG:
 
 Run squash to prepare them for ffmpeg:
 
-NOTE: Did you back up your files?
+**NOTE**: Did you back up your files?
 
     # ./tt squash --src=my_images
     myimages/DSC_0112.JPG -> myimages/00001.png
@@ -44,7 +44,7 @@ NOTE: Did you back up your files?
 
 You have deicded that 1000 frames will make your video too long. You want to drop it down to 500 frames:
 
-NOTE: Did I mention you should have a backup of your files?
+**NOTE**: Did I mention you should have a backup of your files?
 
     # ./tt remove_frames --src=my_images --target-frames=500
     current frames 1000
