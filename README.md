@@ -33,8 +33,6 @@ A directory of 1000 images, from DSC_0112.JPG to DSC_1111.JPG:
 
 Run squash to prepare them for ffmpeg:
 
-**NOTE**: Did you back up your files?
-
     # ./tt squash --src=my_images
     myimages/DSC_0112.JPG -> myimages/00001.png
     myimages/DSC_0113.JPG -> myimages/00002.png
@@ -43,8 +41,6 @@ Run squash to prepare them for ffmpeg:
     myimages/DSC_1111.JPG -> myimages/01000.png
 
 You have deicded that 1000 frames will make your video too long. You want to drop it down to 500 frames:
-
-**NOTE**: Did I mention you should have a backup of your files?
 
     # ./tt remove_frames --src=my_images --target-frames=500
     current frames 1000
@@ -89,5 +85,5 @@ The default ffmpeg settings were appropriate for me, but you can change them by 
 Contact
 -------
 
-Im on Twitter as [@gakman](http://twitter.com/gakman/) or on [email](mailto:tt@gakman.com) if you wish to contact me.
+I'm on Twitter as [@gakman](http://twitter.com/gakman/) or on [email](mailto:tt@gakman.com) if you wish to contact me.
 
