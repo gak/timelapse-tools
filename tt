@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 '''
 Timelapse Tools
 http://github.com/gak/timelapse-tools
@@ -10,6 +10,8 @@ import math
 import argparse
 import tempfile
 from glob import glob
+
+from PIL import Image
 
 
 class TimelapseTools:
@@ -67,7 +69,9 @@ class TimelapseTools:
                 continue
 
             # Spit out the frames
-            d = tempfile.mkdtemp()
+            d = 'tmp'
+            if not os.path.existS(d):
+                os.mkdir(d)
             out = os.path.join(d, '%05d.png')
             TimelapseTools.ffmpeg_split(src=file, fps=args.fps, dst=out)
 
@@ -126,6 +130,34 @@ class TimelapseTools:
                 continue
             print('Removing', frame_name)
             os.unlink(frame_name)
+
+    @staticmethod
+    def brightest(args):
+
+        assert(args.src)
+        assert(args.dst)
+        
+        files = glob(os.path.join(args.src, '*'))
+        im = Image.open(files[0])
+        bytes = im.size[0] * im.size[1] * 3
+        t = uint64
+        images = 0
+
+        final = zeros(bytes, dtype=t)
+
+        for f in files:
+            print(f)
+            im = Image.open(f)
+            imarray = fromstring(im.tostring(), dtype=uint8)
+            imarray = imarray.astype(t)
+            finalimage += imarray
+            images += 1
+
+        finalimage /= images
+
+        limage = finalimage.astype(uint8)
+        im = Image.fromstring(mode, dims, finalimage.tostring())
+        im.save(args.dst)
 
 
 def parser():
